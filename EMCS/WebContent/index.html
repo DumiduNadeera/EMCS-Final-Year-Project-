@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+<title>EMCS</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="resources/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core CSS -->
+<link
+	href="resources/bower_components/bootstrap/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+
+<script
+	src="resources/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- <link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
+
+<script src="resources/js/angular.min.js"></script>
+
+<link rel="stylesheet" type="text/css"
+	href="resources/styles/kendo.common-material.min.css">
+
+<link rel="stylesheet" type="text/css"
+	href="resources/styles/kendo.material.min.css">
+
+<script src="resources/js/kendo.all.min.js"></script>
+
+<script src="mvc/app.js"></script>
+<script src="mvc/DataController.js"></script>
+<script src="mvc/DataService.js"></script>
+<script src="mvc/constants/constants.js"></script>
+
+<style>
+#header {
+	background-color: #222222;
+	padding: 52px 0px;
+}
+
+#logo {
+	display: inline-block;
+	color: white;
+	width: 100%;
+	height: 50px;
+	border: 1px dotted rgba(255, 255, 255, 0.04);
+	position: relative;
+}
+
+#menu {
+	position: absolute;
+	right: 0;
+	top: 15px;
+	display: none;
+}
+
+#nav {
+	list-style: none;
+	padding: 0;
+	display: inline-block;
+}
+
+#nav.vertical {
+	display: block;
+	padding-left: 20px;
+}
+
+#nav.vertical li {
+	display: list-item;
+	line-height: 40px;
+}
+
+#nav li {
+	display: inline-block;
+	padding-right: 40px;
+}
+
+#nav li:last-child {
+	padding-right: 0;
+}
+
+@media screen and (max-width: 800px) {
+	#menu {
+		display: inline-block;
+	}
+	#nav {
+		display: none;
+	}
+}
+</style>
+</head>
+<body ng-controller="DataController" ng-init="init()">
+
+
+	<div id="header">
+		<div id="logo">
+			<h1
+				style="font-family: 'Roboto', sans-serif; font-size: 50px; text-align: center; font-weight: bold;">Environmental
+				Monitoring and Controlling System</h1>
+		</div>
+	</div>
+	<div style="background-color: rgba(34, 34, 34, 0.93);">
+		<ul id="nav">
+			<li id="homeBtn"><span id="homeBtnImg"></span></a></li>
+
+			<li><a style="color: #C5C5C5;" href="#NETWORKDETAILS">SENSOR
+					NETWORK</a></li>
+			<li><a style="color: #C5C5C5;" href="#GAUGES">LATEST VALUES</a></li>
+			<li><a style="color: #C5C5C5;" href="#CHARTS">CHARTS</a></li>
+			<li><a style="color: #C5C5C5;" href="#ABOUT">ABOUT</a></li>
+			<li><a style="color: #C5C5C5;" href="#CONTACT">CONTACT</a></li>
+			<button class="btn btn-default" style="color: #333; margin: 10px;"
+				ng-click="getLatestValueForHumidity();getLatestValueForTemperature();
+				getLatestValueForMoisture();getChartDataForTemperature();getChartDataForHumidity();
+							">Update</button>
+		</ul>
+	</div>
+	<div id="wrapper"
+		style="resize: both; overflow: auto; background-color: #222222;">
+		<div id="page-wrapper"
+			style="margin-left: 18px; margin-right: 28px; background-color: white; padding: 10px;">
+
+			<section id="NETWORKDETAILS">
+				<div style="text-align: center; height: 20px; width: 100%"></div>
+				<div class="row" style="text-align: center;">
+					<h3
+						style="font-size: 28px; font-weight: 800; text-transform: uppercase;">SENSOR
+						NETWORK</h3>
+				</div>
+				<div class="row"
+					style="min-height: 190px; padding: 15px; border: 1px solid; margin-left: 5px; margin-right: 5px;">
+					<div class="row"
+						style="padding: 15px; padding-bottom: 0px; padding-top: 0px">
+						<h4>Number of Sensors : {{noOfSensors.length}}</h4>
+					</div>
+					<div class="row" style="padding: 15px; padding-bottom: 0px">
+						<h4>
+							Sensor types : <span ng-repeat="x in typesOfSensors">{{x.key}}
+								| </span>
+						</h4>
+
+					</div>
+					<div class="row" style="padding: 15px; padding-bottom: 0px">
+						<h4>Network Details :</h4>
+						<h4>
+							<span>businessType : {{networkDetailObject.businessType}}
+								| </span> <span>location : {{networkDetailObject.location}} | </span> <span>owner
+								: {{networkDetailObject.owner}} | </span>
+						</h4>
+					</div>
+				</div>
+			</section>
+			<section id="GAUGES">
+				<div style="text-align: center; height: 20px; width: 100%"></div>
+				<div class="row" style="text-align: center;">
+					<h3
+						style="font-size: 28px; font-weight: 800; text-transform: uppercase;">LATEST
+						VALUES</h3>
+				</div>
+				<div class="row">
+					<div class="col-md-4 col-xs-4" style="height: 210px">
+						<div class="col-md-12 col-xs-12" id="temperatureGauge"
+							style="height: 190px; padding: 15px;"></div>
+						<div class="col-md-12 col-xs-12"
+							style="height: 20px; text-align: center;">Temperature</div>
+					</div>
+
+					<div class="col-md-4 col-xs-4" style="height: 210px">
+						<div class="col-md-12 col-xs-12" id="humidityGauge"
+							style="height: 190px; padding: 15px;"></div>
+						<div class="col-md-12 col-xs-12"
+							style="height: 20px; text-align: center">Humidity Level</div>
+					</div>
+
+					<div class="col-md-4 col-xs-4" style="height: 210px">
+						<div class="col-md-12 col-xs-12" id="moistureGauge"
+							style="height: 190px; padding: 15px;"></div>
+						<div class="col-md-12 col-xs-12"
+							style="height: 20px; text-align: center;">Moisture Level</div>
+					</div>
+				</div>
+			</section>
+
+
+			<section id="CHARTS">
+				<div style="text-align: center; height: 20px; width: 100%"></div>
+				<div class="row" style="text-align: center;">
+					<h3
+						style="font-size: 28px; font-weight: 800; text-transform: uppercase;">CHARTS</h3>
+				</div>
+				<div class="row" style="padding: 2%">
+					<div class="col-md-6 col-xs-6" id="temperatureChart"
+						style="height: 300px; padding: 10px;"></div>
+					<div class="col-md-6 col-xs-6" id="humidityChart"
+						style="height: 300px; padding: 10px;"></div>
+				</div>
+
+			</section>
+			<section id="ABOUT" style="height: 200px;">
+				<div style="text-align: center; height: 20px; width: 100%"></div>
+				<div class="row" style="text-align: center;">
+					<h3
+						style="font-size: 28px; font-weight: 800; text-transform: uppercase;">ABOUT</h3>
+				</div>
+				<p
+					style="margin-left: 15px; margin-right: 15px; text-align: justify;">A
+					wireless sensor network is a group of specialized transducers with
+					a communications infrastructure for monitoring and recording
+					conditions at diverse locations. Commonly monitored parameters are
+					temperature, humidity, pressure, wind direction and speed and etc.
+					A sensor network consists of multiple detection stations called
+					sensor nodes, each of which is small, lightweight and portable.The
+					sensor network communicate with a central node which is connected
+					with all sensor nodes.The central node connects to the distant
+					server which is used to monitor data and control the system.</p>
+			</section>
+
+			<section id="CONTACT" style="height: 200px;">
+				<div style="text-align: center; height: 20px; width: 100%"></div>
+				<div class="row" style="text-align: center; padding-top: 15px;">
+					<h3
+						style="font-size: 28px; font-weight: 800; text-transform: uppercase;">CONTACT</h3>
+				</div>
+			</section>
+
+
+			<footer class="container-fluid text-center">
+				<p>Footer Text</p>
+			</footer>
+
+		</div>
+		<!-- /#page-wrapper -->
+	</div>
+	<!-- /#wrapper -->
+
+</body>
+</html>
